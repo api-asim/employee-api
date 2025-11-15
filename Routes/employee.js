@@ -1,0 +1,18 @@
+import express from "express";
+import authMiddleware from "../Middelware/authMiddelware.js";
+import {upload , addEmployee, getEmployees, getEmployee , updatedEmployee , fetchEmpolyeeById, getMyProfile} from '../control/employeeController.js'
+
+const router = express.Router();
+
+router.get('/api/employee', authMiddleware , getEmployees);
+router.post('/api/employee/add', authMiddleware , upload.single('image') , addEmployee);
+
+router.get('/api/employee/:id', authMiddleware , getEmployee);
+router.get('/api/employee/my-profile', authMiddleware , getMyProfile);
+
+router.put('/api/employee/:id', authMiddleware , updatedEmployee);
+router.get('/api/employee/department/:id', authMiddleware , fetchEmpolyeeById);
+
+
+
+export default router;
