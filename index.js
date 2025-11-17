@@ -14,11 +14,11 @@ import dashboardRouter from './Routes/dashboard.js';
 
 const app = express();
 app.use(cors({
-  origin:process.env.VERCEL_LINK || 'http://localhost:5173',
+    origin:process.env.VERCEL_LINK ,
     credentials: true,
 }));
 app.use(express.json());
-app.use(express.static('public/uploads'))
+// app.use(express.static('public/uploads'))
 dotenv.config();
 
 connenctToDataBase();

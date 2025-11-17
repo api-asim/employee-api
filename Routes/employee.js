@@ -5,12 +5,12 @@ import {upload , addEmployee, getEmployees, getEmployee , updatedEmployee , fetc
 const router = express.Router();
 
 router.get('/api/employee', authMiddleware , getEmployees);
-router.post('/api/employee/add', authMiddleware , upload.single('image') , addEmployee);
+router.post('/api/employee/add', authMiddleware , upload.single('profileImage') , addEmployee);
 
 router.get('/api/employee/:id', authMiddleware , getEmployee);
 router.get('/api/employee/my-profile', authMiddleware , getMyProfile);
 
-router.put('/api/employee/:id', authMiddleware , updatedEmployee);
+router.put('/api/employee/:id', authMiddleware , upload.single('profileImage') , updatedEmployee);
 router.get('/api/employee/department/:id', authMiddleware , fetchEmpolyeeById);
 
 
