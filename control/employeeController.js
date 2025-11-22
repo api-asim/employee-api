@@ -13,11 +13,13 @@ const addEmployee = async(req, res) => {
         const {name , email , employeeId , dob , gender , maritalStatus , designation , department , salary , phoneNumber , password , role} = req.body;
         const user = await User.findOne({email});
         if(user){
-            return res.status(400).json({success: false , error:" user already registered in emp"});
+            return res.status(400).json({success: false , error:"user already registered in emp"});
         }
+        
         const hashPassword = await bcrypt.hash(password , 10);
         let imageUrl = '';
         let publicId = '';
+        
         if (req.file) {
             console.log('Image file detected. Uploading to Cloudinary...');
             const uploadRes = await new Promise((resolve, reject) => {
@@ -37,29 +39,34 @@ const addEmployee = async(req, res) => {
                 publicId = uploadRes.public_id;
             }
         }
+        
         const newUser = new User({
             name , 
             email ,
             password: hashPassword , 
-            role ,
+            role , 
             profileImage: imageUrl, 
             profileImagePublicId: publicId 
         });
         const savedUser = await newUser.save();
-        const newEmployee = new Employee({
-            userId: savedUser._id ,
-            employeeId,
-            dob , 
-            gender , 
-            maritalStatus , 
-            designation , 
-            department , 
-            salary , 
-            phoneNumber
-        });
-        
-        await newEmployee.save()
-        return res.status(200).json({success: true , message:'employee created'})
+
+        if (role === 'employee') {
+            const newEmployee = new Employee({
+                userId: savedUser._id ,
+                employeeId,
+                dob , 
+                gender , 
+                maritalStatus , 
+                designation , 
+                department , 
+                salary , 
+                phoneNumber
+            });
+            
+            await newEmployee.save();
+            return res.status(200).json({success: true , message:'Employee created successfully'});
+        }
+        return res.status(200).json({success: true , message:'Admin user created successfully'});
     }
     catch(err){
         console.error("Add Employee Error:", err);
@@ -173,4 +180,28 @@ const getMyProfile = async (req , res)=>{
     }
 }
 
-export { addEmployee , upload , getEmployees , getEmployee , updatedEmployee , fetchEmpolyeeById , getMyProfile };
+const getAdmins = async (req , res) => {
+    try{
+        const admins = await User.find({ role: 'admin' }).select('-password');
+        return res.status(200).json({ success: true, admins });
+    } catch(err) {
+        console.error("Get Admins server error:", err);
+        return res.status(500).json({ success: false, message: 'Server error retrieving admin accounts' });
+    }
+}
+
+const getAdminDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const adminUser = await User.findOne({ _id: id, role: 'admin' }).select('-password');
+        if (!adminUser) {
+            return res.status(404).json({ success: false, message: 'Admin user not found' });
+        }
+        return res.status(200).json({ success: true, admin: adminUser });
+    } catch (err) {
+        console.error("Get Admin Details server error:", err);
+        return res.status(500).json({ success: false, message: 'Server error retrieving admin details' });
+    }
+}
+
+export { addEmployee , upload , getEmployees , getEmployee , updatedEmployee , fetchEmpolyeeById , getMyProfile , getAdmins , getAdminDetails};

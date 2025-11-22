@@ -1,6 +1,6 @@
 import express from "express";
 import authMiddleware from "../Middelware/authMiddelware.js";
-import {upload , addEmployee, getEmployees, getEmployee , updatedEmployee , fetchEmpolyeeById, getMyProfile} from '../control/employeeController.js'
+import {upload , addEmployee, getEmployees, getEmployee , updatedEmployee , fetchEmpolyeeById, getMyProfile, getAdmins, getAdminDetails} from '../control/employeeController.js'
 
 const router = express.Router();
 
@@ -14,5 +14,7 @@ router.put('/api/employee/:id', authMiddleware , upload.single('profileImage') ,
 router.get('/api/employee/department/:id', authMiddleware , fetchEmpolyeeById);
 
 
+router.get('/api/admins', authMiddleware, getAdmins);
+router.get('/api/admins/:id', authMiddleware, getAdminDetails);
 
 export default router;
