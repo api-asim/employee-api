@@ -35,4 +35,55 @@ const login = async (req, res) => {
 const verify = (req , res)=>{
     return res.status(200).json({success:true , user: req.user});
 }
-export { login , verify};
+
+
+const generateResetToken = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found with this email." });
+        }
+        
+        const shortLivedToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '5m' });
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Reset link generated successfully.",
+            token: shortLivedToken 
+        });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Server error", error: err.message });
+    }
+}
+
+const simpleResetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ success: false, error: "Reset token is missing." });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        const user = await User.findById(decoded._id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found or token is invalid." });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password updated successfully. You can log in now." });
+        
+    } catch (err) {
+        res.status(400).json({ success: false, message: "Invalid or expired reset token.", error: err.message });
+    }
+}
+
+export { login , verify , generateResetToken , simpleResetPassword};

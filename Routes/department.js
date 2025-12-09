@@ -10,6 +10,4 @@ router.get('/api/department/:id', authMiddleware , getDepartment);
 router.put('/api/department/:id', authMiddleware , updatedDepartment);
 router.delete('/api/department/:id', authMiddleware , deleDepartment);
 
-
-
 export default router;
