@@ -14,8 +14,8 @@ import dashboardRouter from './Routes/dashboard.js';
 
 const app = express();
 app.use(cors({
-    origin:'http://localhost:5173',
-    // origin:process.env.VERCEL_LINK ,
+    // origin:'http://localhost:5173',
+    origin:process.env.VERCEL_LINK ,
     credentials: true,
 }));
 app.use(express.json());
